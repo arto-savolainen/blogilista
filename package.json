@@ -6,11 +6,12 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --verbose"
   },
   "author": "Arto Savolainen",
   "license": "MIT",
   "devDependencies": {
+    "jest": "^29.1.2",
     "nodemon": "^2.0.20"
   },
   "dependencies": {
@@ -19,5 +20,8 @@
     "express": "^4.18.2",
     "mongoose": "^6.6.5",
     "morgan": "^1.10.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
