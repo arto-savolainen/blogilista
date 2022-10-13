@@ -1,6 +1,6 @@
 const listHelper = require('../utils/list_helper')
 
-describe('total likes', () => {
+describe('favorite blog', () => {
   const emptyList = []
 
   const listWithOneBlog = [
@@ -33,28 +33,52 @@ describe('total likes', () => {
     },
     {
       _id: '5a422aa71b54a676234d17f8',
-      title: '400 likes blog',
+      title: 'big likes blog',
       author: 'Liked Man',
       url: 'www.greatblog.org',
-      likes: 400,
+      likes: 40000000000000000000000000000000000000000000000000000000000000000,
+      __v: 0
+    },
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Lowly Blog',
+      author: 'OOOO',
+      url: 'www.ooooooooo.xxx',
+      likes: 6,
       __v: 0
     }
   ]
 
+  test('of empty list is {}', () => {
+    const t0 = performance.now()
 
+    const result = listHelper.favoriteBlog(emptyList)
 
-  test('of empty list is zero', () => {
-    const result = listHelper.totalLikes(emptyList)
-    expect(result).toBe(0)
+    const t1 = performance.now()
+    console.log('t1 - t0:', t1 - t0)
+    
+    expect(result).toEqual({})
   })
 
-  test('when list has only one blog equals the likes of that', () => {
-    const result = listHelper.totalLikes(listWithOneBlog)
-    expect(result).toBe(5)
+  test('when list has only one blog returns that object', () => {
+    const t0 = performance.now()
+
+    const result = listHelper.favoriteBlog(listWithOneBlog)
+
+    const t1 = performance.now()
+    console.log('t1 - t0:', t1 - t0)
+
+    expect(result).toEqual(listWithOneBlog[0])
   })
 
   test('of a bigger list is calculated right', () => {
-    const result = listHelper.totalLikes(biggerList)
-    expect(result).toBe(420)
+    const t0 = performance.now()
+ 
+    const result = listHelper.favoriteBlog(biggerList)
+   
+    const t1 = performance.now()
+    console.log('t1 - t0:', t1 - t0)
+  
+    expect(result).toEqual(biggerList[2])
   })
 })
