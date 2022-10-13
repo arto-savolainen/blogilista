@@ -62,7 +62,7 @@ describe('favorite blog', () => {
       url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
       likes: 2,
       __v: 0
-    },  
+    },
     {
       _id: '5a422aa71b54a676234d17f8',
       title: 'Bloopp',
@@ -76,7 +76,7 @@ describe('favorite blog', () => {
       title: 'big likes blog',
       author: 'Liked Man',
       url: 'www.greatblog.org',
-      likes: 4000,
+      likes: 358,
       __v: 0
     },
     {

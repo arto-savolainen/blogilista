@@ -1,6 +1,6 @@
 const listHelper = require('../utils/list_helper')
 
-describe('most blogs', () => {
+describe('most likes', () => {
   const emptyList = []
 
   const listWithOneBlog = [
@@ -68,15 +68,7 @@ describe('most blogs', () => {
       title: 'Bloopp',
       author: 'Blabps',
       url: 'www.blblasd.asd',
-      likes: 20,
-      __v: 0
-    },
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'big likes blog',
-      author: 'Liked Man',
-      url: 'www.greatblog.org',
-      likes: 358,
+      likes: 1,
       __v: 0
     },
     {
@@ -89,10 +81,53 @@ describe('most blogs', () => {
     }
   ]
 
-  test('of empty list is {}', () => {
+  const zeroLikesList = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Bloopp',
+      author: 'Blabps',
+      url: 'www.blblasd.asd',
+      likes: 0,
+      __v: 0
+    },
+    {
+      _id: "5a422b891b54a676234d17fa",
+      title: "First class tests",
+      author: "Robert C. Martin",
+      url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+      likes: 0,
+      __v: 0
+    },
+    {
+      _id: "5a422ba71b54a676234d17fb",
+      title: "TDD harms architecture",
+      author: "Robert C. Martin",
+      url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
+      likes: 0,
+      __v: 0
+    },
+    {
+      _id: "5a422bc61b54a676234d17fc",
+      title: "Type wars",
+      author: "Robert C. Martin",
+      url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+      likes: 0,
+      __v: 0
+    },
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Lowly Blog',
+      author: 'OOOO',
+      url: 'www.ooooooooo.xxx',
+      likes: 0,
+      __v: 0
+    }
+  ]
+
+  test('of empty list is empty object {}', () => {
     const t0 = performance.now()
 
-    const result = listHelper.mostBlogs(emptyList)
+    const result = listHelper.mostLikes(emptyList)
 
     const t1 = performance.now()
     console.log('t1 - t0:', t1 - t0)
@@ -100,25 +135,36 @@ describe('most blogs', () => {
     expect(result).toEqual({})
   })
 
-  test('when list has only one blog returns that object', () => {
+  test('when list has only one blog returns information from that blog', () => {
     const t0 = performance.now()
 
-    const result = listHelper.mostBlogs(listWithOneBlog)
+    const result = listHelper.mostLikes(listWithOneBlog)
 
     const t1 = performance.now()
     console.log('t1 - t0:', t1 - t0)
 
-    expect(result).toEqual({ author: 'Edsger W. Dijkstra', blogs: 1 })
+    expect(result).toEqual({"author": "Edsger W. Dijkstra", "likes": 5})
   })
 
   test('of a bigger list is calculated right', () => {
     const t0 = performance.now()
- 
-    const result = listHelper.mostBlogs(biggerList)
-   
+
+    const result = listHelper.mostLikes(biggerList)
+
     const t1 = performance.now()
     console.log('t1 - t0:', t1 - t0)
-  
-    expect(result).toEqual({ author: 'Robert C. Martin', blogs: 3 })
+
+    expect(result).toEqual({ author: 'Edsger W. Dijkstra', likes: 17 })
+  })
+
+  test('of a list with 0 likes in every item returns information from the first element', () => {
+    const t0 = performance.now()
+
+    const result = listHelper.mostLikes(zeroLikesList)
+
+    const t1 = performance.now()
+    console.log('t1 - t0:', t1 - t0)
+
+    expect(result).toEqual({ author: 'Blabps', likes: 0 })
   })
 })
