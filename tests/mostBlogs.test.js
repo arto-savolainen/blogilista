@@ -1,6 +1,6 @@
 const listHelper = require('../utils/list_helper')
 
-describe('favorite blog', () => {
+describe('most blogs', () => {
   const emptyList = []
 
   const listWithOneBlog = [
@@ -92,7 +92,7 @@ describe('favorite blog', () => {
   test('of empty list is {}', () => {
     const t0 = performance.now()
 
-    const result = listHelper.favoriteBlog(emptyList)
+    const result = listHelper.mostBlogs(emptyList)
 
     const t1 = performance.now()
     console.log('t1 - t0:', t1 - t0)
@@ -103,22 +103,22 @@ describe('favorite blog', () => {
   test('when list has only one blog returns that object', () => {
     const t0 = performance.now()
 
-    const result = listHelper.favoriteBlog(listWithOneBlog)
+    const result = listHelper.mostBlogs(listWithOneBlog)
 
     const t1 = performance.now()
     console.log('t1 - t0:', t1 - t0)
 
-    expect(result).toEqual(listWithOneBlog[0])
+    expect(result).toEqual({ author: 'Edsger W. Dijkstra', blogs: 1 })
   })
 
   test('of a bigger list is calculated right', () => {
     const t0 = performance.now()
  
-    const result = listHelper.favoriteBlog(biggerList)
+    const result = listHelper.mostBlogs(biggerList)
    
     const t1 = performance.now()
     console.log('t1 - t0:', t1 - t0)
   
-    expect(result).toEqual(biggerList[7])
+    expect(result).toEqual({ author: 'Robert C. Martin', blogs: 3 })
   })
 })
