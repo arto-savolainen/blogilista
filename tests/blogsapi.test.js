@@ -131,8 +131,23 @@ describe('HTTP POST', () => {
     newBlog.id = response.body.id
     expect(response.body).toEqual(newBlog)
   })
-})
 
+  test('adding a new blog with missing "likes" field sets likes to 0', async () => {
+    let newBlog = {
+      title: 'New Blog',
+      author: 'New Author',
+      url: 'www.newblog.bloggs'
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.likes).toBe(0)
+  })
+})
 
 afterAll(() => {
   mongoose.connection.close()
