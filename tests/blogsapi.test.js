@@ -84,14 +84,26 @@ beforeEach(async () => {
   await blogObject.save()
 })
 
-describe('bloglist rest api', () => {
-  test('http get returns correct amount of blog items', async () => {
+describe('http get', () => {
+  test('returns correct amount of blog items', async () => {
     const response = await api
       .get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
-      expect(response.body.length).toBe(8)
+    expect(response.body.length).toBe(8)
+  })
+
+  test('field "id" is defined for each blog item', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const blogs = response.body
+    blogs.forEach(x => {
+      expect(x.id).toBeDefined()
+    })
   })
 
 })
