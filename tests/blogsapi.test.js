@@ -105,6 +105,7 @@ describe('HTTP POST', () => {
 
     await api
       .post('/api/blogs')
+      .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -132,7 +133,7 @@ describe('HTTP POST', () => {
     expect(response.body).toEqual(newBlog)
   })
 
-  test('adding a new blog with missing "likes" field sets likes to 0', async () => {
+  test('adding a blog with missing "likes" field sets likes to 0', async () => {
     let newBlog = {
       title: 'New Blog',
       author: 'New Author',
@@ -146,6 +147,30 @@ describe('HTTP POST', () => {
       .expect('Content-Type', /application\/json/)
 
     expect(response.body.likes).toBe(0)
+  })
+
+  test('adding a blog with a missing "title" or "url" field returns HTTP code 400 Bad Request', async () => {
+    let newBlog = {
+      author: 'New Author',
+      url: 'www.newblog.bloggs',
+      likes: 2
+    }
+
+    let response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+
+    newBlog = {
+      title: 'New Blog',
+      author: 'New Author',
+      likes: 2
+    }
+
+    response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
   })
 })
 

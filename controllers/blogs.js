@@ -15,8 +15,14 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
   let newBlog = request.body
 
-  if (!newBlog.likes) { 
-    newBlog.likes = 0 
+  //technically this is not needed since validators will fail and error handling will return code 400
+  if (!newBlog.title || !newBlog.url) {
+    return response.status(400).end()
+  }
+
+  //Is it possible to do this during db validation?
+  if (!newBlog.likes) {
+    newBlog.likes = 0
   }
 
   const blog = new Blog(newBlog)
