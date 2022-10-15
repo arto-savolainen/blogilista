@@ -1,11 +1,13 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const { listIndexes } = require('../models/blog')
 
 
-const blogListWith8Blogs = [
+const blogList = [
   {
     title: "React patterns",
     author: "Michael Chan",
@@ -66,32 +68,17 @@ const blogListWith8Blogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(blogListWith8Blogs[0])
-  await blogObject.save()
-  blogObject = new Blog(blogListWith8Blogs[1])
-  await blogObject.save()
-  blogObject = new Blog(blogListWith8Blogs[2])
-  await blogObject.save()
-  blogObject = new Blog(blogListWith8Blogs[3])
-  await blogObject.save()
-  blogObject = new Blog(blogListWith8Blogs[4])
-  await blogObject.save()
-  blogObject = new Blog(blogListWith8Blogs[5])
-  await blogObject.save()
-  blogObject = new Blog(blogListWith8Blogs[6])
-  await blogObject.save()
-  blogObject = new Blog(blogListWith8Blogs[7])
-  await blogObject.save()
+  await Blog.insertMany(blogList)
 })
 
-describe('http get', () => {
+describe('HTTP GET', () => {
   test('returns correct amount of blog items', async () => {
     const response = await api
       .get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
-    expect(response.body.length).toBe(8)
+    expect(response.body).toHaveLength(blogList.length)
   })
 
   test('field "id" is defined for each blog item', async () => {
@@ -105,7 +92,45 @@ describe('http get', () => {
       expect(x.id).toBeDefined()
     })
   })
+})
 
+describe('HTTP POST', () => {
+  test('adding a new blog succesfully increases database blog count by one', async () => {
+    let newBlog = {
+      title: 'New Blog',
+      author: 'New Author',
+      url: 'www.newblog.bloggs',
+      likes: '111111116'
+    }
+
+    await api
+      .post('/api/blogs')
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const getResponse = await api.get('/api/blogs')
+
+    expect(getResponse.body).toHaveLength(blogList.length + 1)
+  })
+
+  test('adding a new blog succesfully returns the added blog item', async () => {
+    let newBlog = {
+      title: 'New Blog',
+      author: 'New Author',
+      url: 'www.newblog.bloggs',
+      likes: 111111116
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    //first get the id of the returned blog object so we can properly compare newBlog and the returned blog
+    newBlog.id = response.body.id
+    expect(response.body).toEqual(newBlog)
+  })
 })
 
 
