@@ -6,8 +6,8 @@ const nonExistingId = async () => {
     title: 'bolg',
     url: 'a.d.gv',
     likes: 10000 
-  }
-  )
+  })
+
   await blog.save()
   await blog.remove()
 

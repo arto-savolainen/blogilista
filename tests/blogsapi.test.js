@@ -174,6 +174,38 @@ describe('HTTP POST', () => {
   })
 })
 
+describe('HTTP DELETE', () => {
+  test('the deleted item is returned in the response and database size is reduced by one after successful delete', async () => {
+    let response = await api.get('/api/blogs')
+    let deletedBlog = response.body[0]
+    const id = deletedBlog.id
+
+    response = await api
+      .delete(`/api/blogs/${id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body).toEqual(deletedBlog)
+
+    response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(blogList.length - 1)
+  })
+
+  test('delete with invalid id returns HTTP code 400 Bad Request', async () => {
+    response = await api
+      .delete(`/api/blogs/invalid_id_lololo`)
+      .expect(400)
+  })
+
+  test('delete with valid but not found id returns HTTP code 404 Not Found', async () => {
+    const id = await helper.nonExistingId()
+
+    await api
+      .delete(`/api/blogs/${id}`)
+      .expect(404)
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
