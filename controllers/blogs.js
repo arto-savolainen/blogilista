@@ -1,4 +1,5 @@
 const blogsRouter = require('express').Router()
+const { update } = require('lodash')
 const Blog =  require('../models/blog')
 
 blogsRouter.get('/', async (request, response) => {
@@ -34,10 +35,29 @@ blogsRouter.delete('/:id', async (request, response) => {
   const result = await Blog.findByIdAndDelete(request.params.id)
 
   if (result) {
-    return response.json(result)
+    response.json(result)
   }
   else {
-    return response.status(404).end()
+    response.status(404).end()
+  }
+})
+
+blogsRouter.put('/:id', async (request, response) => {
+  const updateData = request.body
+
+  if (!updateData.likes) {
+    updateData.likes = 0
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id,
+    updateData,
+    { new: true, runValidators: true, context: 'query' })
+
+  if (updatedBlog) {
+    response.status(200).json(updatedBlog)
+  }
+  else {
+    response.status(404).end()
   }
 })
 

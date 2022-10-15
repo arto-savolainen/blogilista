@@ -5,6 +5,7 @@ const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
 const { listIndexes } = require('../models/blog')
+const { updateWith } = require('lodash')
 
 
 const blogList = [
@@ -175,7 +176,7 @@ describe('HTTP POST', () => {
 })
 
 describe('HTTP DELETE', () => {
-  test('the deleted item is returned in the response and database size is reduced by one after successful delete', async () => {
+  test('the deleted item is returned in the response and database size is reduced by one after successful deletion', async () => {
     let response = await api.get('/api/blogs')
     let deletedBlog = response.body[0]
     const id = deletedBlog.id
@@ -197,13 +198,85 @@ describe('HTTP DELETE', () => {
       .expect(400)
   })
 
-  test('delete with valid but not found id returns HTTP code 404 Not Found', async () => {
+  test('DELETE with valid but not found id returns HTTP code 404 Not Found', async () => {
     const id = await helper.nonExistingId()
 
     await api
       .delete(`/api/blogs/${id}`)
       .expect(404)
   })
+})
+
+describe('HTTP PUT', () => {
+  test('when updating likes: updated item is returned and matches request data after successful PUT', async () => {
+    const getResponse = await api.get('/api/blogs')
+    let updateData = getResponse.body[0]
+    updateData.likes = 9999999999999
+
+    const putResponse = await api
+      .put(`/api/blogs/${updateData.id}`)
+      .send(updateData)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(putResponse.body).toEqual(updateData)
+  })
+
+  test('when updating with missing "title" or "url" fields: returns HTTP code 400 Bad Request', async () => {
+    const getResponse = await api.get('/api/blogs')
+    let updateData = getResponse.body[0]
+    updateData.title = ''
+    updateData.likes = 9999999999999
+
+    await api
+      .put(`/api/blogs/${updateData.id}`)
+      .send(updateData)
+      .expect(400)
+
+    updateData = getResponse.body[1]
+    updateData.url = ''
+
+    await api
+      .put(`/api/blogs/${updateData.id}`)
+      .send(updateData)
+      .expect(400)
+
+    updateData = getResponse.body[2]
+    updateData.author = ''
+    updateData.likes = -6000
+
+    const validDataResponse = await api
+      .put(`/api/blogs/${updateData.id}`)
+      .send(updateData)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(validDataResponse.body).toEqual(updateData)
+  })
+
+  test('PUT with invalid id returns HTTP code 400 Bad Request', async () => {
+    let response = await api.get('/api/blogs')
+    let updateData = response.body[0]
+    updateData.likes = 9999999999999
+
+    response = await api
+      .put(`/api/blogs/invalid_id_lololo`)
+      .send(updateData)
+      .expect(400)
+  })
+
+  test('PUT with valid but not found id returns HTTP code 404 Not Found', async () => {
+    let response = await api.get('/api/blogs')
+    let updateData = response.body[0]
+    updateData.likes = 9999999999999
+    const id = await helper.nonExistingId()
+
+    await api
+      .put(`/api/blogs/${id}`)
+      .send(updateData)
+      .expect(404)
+  })
+
 })
 
 afterAll(() => {
