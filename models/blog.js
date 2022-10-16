@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 
 const blogSchema = mongoose.Schema({
   title: {
@@ -26,6 +27,8 @@ const blogSchema = mongoose.Schema({
     }
   }*/
 })
+
+blogSchema.plugin(uniqueValidator, { message: 'Error: {PATH} must be unique.' })
 
 blogSchema.set('toJSON', {
   transform: (document, returnedObject) => {
