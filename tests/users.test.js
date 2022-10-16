@@ -13,9 +13,9 @@ const userList = [
     password: 'eihele'
   },
   {
-    username: 'k',
+    username: 'klol',
     name: 'K',
-    password: 'k'
+    password: 'klol'
   },
   {
     username: 'AAAAAAAAAAAAAAAAAAAAAAA',
@@ -24,10 +24,12 @@ const userList = [
   }
 ]
 
+beforeEach(async () => {
+  await User.deleteMany({})
+})
+
 describe('HTTP POST with one initial user in db', () => {
   beforeEach(async () => {
-    await User.deleteMany({})
-
     const passwordHash = await bcrypt.hash('sekret', 12)
     const user = new User({ username: 'root', passwordHash })
 
@@ -65,13 +67,13 @@ describe('HTTP POST with one initial user in db', () => {
       password: 'salainen',
     }
 
-    const result = await api
+    const response = await api
       .post('/api/users')
       .send(newUser)
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    expect(result.body.error).toContain('Error: username must be unique.')
+    expect(response.body.error).toContain('Error: username must be unique.')
 
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
@@ -80,18 +82,13 @@ describe('HTTP POST with one initial user in db', () => {
 
 describe('HTTP GET', () => {
   beforeEach(async () => {
-    await User.deleteMany({})
     // await User.insertMany(userList)
     // const users = await helper.usersInDb()
     // console.log('users:', users)
 
     for (const user of userList) {
-      console.log('USER', user)
       await api.post('/api/users').send(user)
     }
-    const usersindbnow = await helper.usersInDb()
-    console.log('usersindb:', usersindbnow)
-
   })
 
   test('GET successfully fetches list of users, returned usernames and names equal those in userList', async () => {
@@ -109,6 +106,78 @@ describe('HTTP GET', () => {
       expect(user.username).toBe(userList[i].username)
       expect(user.name).toBe(userList[i].name)
     })
+  })
+})
+
+describe('HTTP POST user with invalid info', () => {
+  test('missing username or password field returns HTTP code 400 Bad Request and correct error msg, db size does not change', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    let newUser = {
+      username: '',
+      name: 'erkki',
+      password: 'pena'
+    }
+
+    let response = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toContain('Error: username must be at least')
+
+    newUser = {
+      username: 'pena',
+      name: 'erkki',
+      password: ''
+    }
+
+    response = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toContain('Error: password must be at least')
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+
+  test('username or password shorter than 3 characters returns HTTP code 400 Bad Request and correct error msg, db size does not change', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    let newUser = {
+      username: 'E',
+      name: 'erkki',
+      password: 'pena'
+    }
+
+    let response = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toContain('Error: username must be at least')
+
+    newUser = {
+      username: 'pena',
+      name: 'pena',
+      password: '69'
+    }
+
+    response = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toContain('Error: password must be at least')
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
   })
 })
 
