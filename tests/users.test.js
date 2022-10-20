@@ -73,7 +73,7 @@ describe('HTTP POST with one initial user in db', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    expect(response.body.error).toContain('Error: username must be unique.')
+    expect(response.body.error).toContain('username must be unique.')
 
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
@@ -125,7 +125,7 @@ describe('HTTP POST user with invalid info', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    expect(response.body.error).toContain('Error: username must be at least')
+    expect(response.body.error).toContain('username must be at least')
 
     newUser = {
       username: 'pena',
@@ -139,7 +139,7 @@ describe('HTTP POST user with invalid info', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    expect(response.body.error).toContain('Error: password must be at least')
+    expect(response.body.error).toContain('password must be at least')
 
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
@@ -160,7 +160,7 @@ describe('HTTP POST user with invalid info', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    expect(response.body.error).toContain('Error: username must be at least')
+    expect(response.body.error).toContain('username must be at least')
 
     newUser = {
       username: 'pena',
@@ -174,7 +174,7 @@ describe('HTTP POST user with invalid info', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    expect(response.body.error).toContain('Error: password must be at least')
+    expect(response.body.error).toContain('password must be at least')
 
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)

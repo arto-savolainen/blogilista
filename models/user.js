@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 const config = require('../utils/config')
 
-const USERNAME_LENGTH_ERROR = `Error: username must be at least ${config.USERNAME_MIN_LENGTH} characters long.`
+const USERNAME_LENGTH_ERROR = `username must be at least ${config.USERNAME_MIN_LENGTH} characters long.`
 
 const userSchema = mongoose.Schema({
   blogs: [
@@ -25,7 +25,7 @@ const userSchema = mongoose.Schema({
   }
 })
 
-userSchema.plugin(uniqueValidator, { message: 'Error: {PATH} must be unique.' })
+userSchema.plugin(uniqueValidator, { message: '{PATH} must be unique.' })
 
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
