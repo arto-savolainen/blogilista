@@ -1,4 +1,5 @@
 const User = require('../models/user')
+const Blog = require('../models/blog')
 
 const nonExistingId = async () => {
   const blog = new Blog({ 

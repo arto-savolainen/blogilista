@@ -181,6 +181,14 @@ describe('HTTP POST user with invalid info', () => {
   })
 })
 
+describe('populate user db as last test for other tests', () =>{
+  test('add userList to db via post', async () =>{
+    for (const user of userList) {
+      await api.post('/api/users').send(user)
+    }
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })

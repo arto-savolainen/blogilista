@@ -2,14 +2,18 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
 const blogSchema = mongoose.Schema({
+  url: {
+    type: String,
+    required: true
+  },
   title: {
     type: String,
     required: true
   },
   author: String,
-  url: {
-    type: String,
-    required: true
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
   likes: Number
  /*likes: {
@@ -33,6 +37,8 @@ blogSchema.plugin(uniqueValidator, { message: 'Error: {PATH} must be unique.' })
 blogSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
+    // if (returnedObject._id) { returnedObject.id = returnedObject._id.toString() }
+    //if (returnedObject.user.constructor.name && (returnedObject.user.costructor.name === 'ObjectId')) { console.log('YEPPPPPPPPPPPP'); returnedObject.user = returnedObject.user.toString() }
     delete returnedObject._id
     delete returnedObject.__v
   }

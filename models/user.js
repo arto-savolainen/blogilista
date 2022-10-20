@@ -2,13 +2,19 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 const config = require('../utils/config')
 
-const USERNAME_LENGTH_ERROR_MSG = `Error: username must be at least ${config.USERNAME_MIN_LENGTH} characters long.`
+const USERNAME_LENGTH_ERROR = `Error: username must be at least ${config.USERNAME_MIN_LENGTH} characters long.`
 
 const userSchema = mongoose.Schema({
+  blogs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Blog'
+    }
+  ],
   username: {
     type: String,
-    required: [true, USERNAME_LENGTH_ERROR_MSG],
-    minLength: [config.USERNAME_MIN_LENGTH, USERNAME_LENGTH_ERROR_MSG],
+    required: [true, USERNAME_LENGTH_ERROR],
+    minLength: [config.USERNAME_MIN_LENGTH, USERNAME_LENGTH_ERROR],
     unique: true,
     uniqueCaseInsensitive: true
   },
@@ -24,6 +30,7 @@ userSchema.plugin(uniqueValidator, { message: 'Error: {PATH} must be unique.' })
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
+    //returnedObject.users = returnedObject.users.map(x => { x.toString() })
     delete returnedObject._id
     delete returnedObject.__v
     delete returnedObject.passwordHash
