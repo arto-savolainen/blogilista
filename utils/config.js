@@ -8,9 +8,12 @@ let MONGODB_URI = process.env.NODE_ENV === 'test'
 let USERNAME_MIN_LENGTH = 3
 let PASSWORD_MIN_LENGTH = 3
 
+let SECRET = process.env.SECRET
+
 module.exports = {
   MONGODB_URI,
   PORT,
   USERNAME_MIN_LENGTH,
-  PASSWORD_MIN_LENGTH
+  PASSWORD_MIN_LENGTH,
+  SECRET
 }
