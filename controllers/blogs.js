@@ -1,24 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
-const config = require('../utils/config')
-
-// //temp for testing
-// const supertest = require('supertest')
-// const helper = require('../tests/test_helper')
-// const app = require('../app')
-// const api = supertest(app)
-
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.substring(7)
-  }
-
-  return null
-}
+//const jwt = require('jsonwebtoken') not needed if middleware sets token and decodedToken
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { blogs: 0 })
@@ -37,19 +20,12 @@ blogsRouter.post('/', async (request, response) => {
   if (!newBlog.likes) {
     newBlog.likes = 0
   }
-
-  const token = getTokenFrom(request)
-  let decodedToken
  
-  if (token) {
-    decodedToken = jwt.verify(token, config.SECRET)
-  }
-
-  if (!token || !decodedToken.id) {
+  if (!request.token || !request.decodedToken.id) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
-  const user = await User.findById(decodedToken.id)
+  const user = await User.findById(request.decodedToken.id)
   const blog = new Blog(newBlog)
   blog.user = user._id
   const savedBlog = await blog.save()
