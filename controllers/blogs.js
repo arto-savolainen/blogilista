@@ -11,6 +11,7 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const newBlog = request.body
+
   //technically this is not needed since validators will fail and error handling will return code 400
   if (!newBlog.title || !newBlog.url) {
     return response.status(400).end()
@@ -25,8 +26,9 @@ blogsRouter.post('/', async (request, response) => {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
-  const user = await User.findById(request.decodedToken.id)
+  const user = request.user
   const blog = new Blog(newBlog)
+
   blog.user = user._id
   const savedBlog = await blog.save()
 
@@ -37,14 +39,22 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  const result = await Blog.findByIdAndDelete(request.params.id)
+  if (!request.token || !request.decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
 
-  if (result) {
-    response.json(result.toJSON())
+  const blog = await Blog.findById(request.params.id)
+
+  if (!blog) {
+    return response.status(404).end()
   }
-  else {
-    response.status(404).end()
+
+  if (blog.user.toString() === request.user._id.toString()) {
+    blog.delete()
+    return response.json(blog.toJSON())
   }
+
+  response.status(401).json({ error: 'not authorized' })
 })
 
 blogsRouter.put('/:id', async (request, response) => {
