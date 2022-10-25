@@ -5,6 +5,7 @@ const app = require('../app')
 const api = supertest(app)
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const { before } = require('lodash')
 
 const userList = [
   {
@@ -24,12 +25,11 @@ const userList = [
   }
 ]
 
-beforeEach(async () => {
-  await User.deleteMany({})
-})
-
 describe('HTTP POST with one initial user in db', () => {
   beforeEach(async () => {
+
+    await User.deleteMany({})
+
     const passwordHash = await bcrypt.hash('sekret', 12)
     const user = new User({ username: 'root', passwordHash })
 
@@ -85,6 +85,7 @@ describe('HTTP GET', () => {
     // await User.insertMany(userList)
     // const users = await helper.usersInDb()
     // console.log('users:', users)
+    await User.deleteMany({})
 
     for (const user of userList) {
       await api.post('/api/users').send(user)
@@ -182,10 +183,21 @@ describe('HTTP POST user with invalid info', () => {
 })
 
 describe('populate user db as last test for other tests', () =>{
+  beforeAll(async () => {
+    await User.deleteMany({})
+  })
+
   test('add userList to db via post', async () =>{
     for (const user of userList) {
       await api.post('/api/users').send(user)
     }
+  })
+
+  test('login the first user in the list so other tests can use their token', async () => {
+    const loginObject = await api.post('/api/login')
+    .send({ username: userList[0].username, password: userList[0].password })
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
   })
 })
 

@@ -39,6 +39,7 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
+
   if (!request.token || !request.decodedToken.id) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
@@ -60,6 +61,7 @@ blogsRouter.delete('/:id', async (request, response) => {
 blogsRouter.put('/:id', async (request, response) => {
   const updateData = request.body
 
+  //why do i have this here? delete after put testing 
   if (!updateData.likes) {
     updateData.likes = 0
   }
