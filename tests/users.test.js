@@ -5,7 +5,6 @@ const app = require('../app')
 const api = supertest(app)
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
-const { before } = require('lodash')
 
 const userList = [
   {

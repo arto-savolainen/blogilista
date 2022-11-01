@@ -103,9 +103,9 @@ beforeEach(async () => {
   await Blog.deleteMany({})
   for (const blog of blogList) {
     await api
-    .post('/api/blogs')
-    .set('Authorization', `Bearer ${token}`)
-    .send(blog)
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(blog)
   }
 })
 
@@ -279,14 +279,14 @@ describe('HTTP DELETE', () => {
       .delete(`/api/blogs/${id}`)
       .expect(401)
   })
-  
+
   test('trying to delete a blog with another user\'s auth token returns 401 Unauthorized', async () => {
     let blogs = await Blog.find({})
     const blogToDelete = blogs[0].toJSON()
     const id = blogToDelete.id
 
     const loginResponse = await api.post('/api/login')
-    .send({ username: userList[1].username, password: userList[1].password })
+      .send({ username: userList[1].username, password: userList[1].password })
 
     const wrongToken = loginResponse.body.token
 
@@ -300,8 +300,7 @@ describe('HTTP DELETE', () => {
   })
 })
 
-//PUT ei toimi nykyisen token / user middlewaren kanssa joten jätetään testaus myöhemmäksi
-/*describe('HTTP PUT', () => {
+describe('HTTP PUT', () => {
   test('when updating likes: updated item is returned and matches request data after successful PUT', async () => {
     const blogs = await Blog.find({})
     let updateBlog = blogs[0].toJSON()
@@ -309,6 +308,7 @@ describe('HTTP DELETE', () => {
 
     const putResponse = await api
       .put(`/api/blogs/${updateBlog.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updateBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -330,6 +330,7 @@ describe('HTTP DELETE', () => {
 
     await api
       .put(`/api/blogs/${updateBlog.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updateBlog)
       .expect(400)
 
@@ -338,6 +339,7 @@ describe('HTTP DELETE', () => {
 
     await api
       .put(`/api/blogs/${updateBlog.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updateBlog)
       .expect(400)
 
@@ -348,6 +350,7 @@ describe('HTTP DELETE', () => {
 
     const validDataResponse = await api
       .put(`/api/blogs/${updateBlog.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updateBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -362,6 +365,7 @@ describe('HTTP DELETE', () => {
 
     response = await api
       .put(`/api/blogs/invalid_id_lololo`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updateBlog)
       .expect(400)
   })
@@ -381,11 +385,31 @@ describe('HTTP DELETE', () => {
 
     await api
       .put(`/api/blogs/${id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updateBlog)
       .expect(404)
   })
 
-})*/
+  test('trying to update a blog with another user\'s auth token returns 401 Unauthorized', async () => {
+    let blogs = await Blog.find({})
+    const updateBlog = blogs[0].toJSON()
+    const id = updateBlog.id
+
+    const loginResponse = await api.post('/api/login')
+      .send({ username: userList[1].username, password: userList[1].password })
+
+    const wrongToken = loginResponse.body.token
+
+    response = await api
+      .put(`/api/blogs/${id}`)
+      .set('Authorization', `Bearer ${wrongToken}`)
+      .send(updateBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toContain('not authorized')
+  })
+})
 
 afterAll(() => {
   mongoose.connection.close()
