@@ -34,8 +34,6 @@ const blogSchema = mongoose.Schema({
 blogSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
-    // if (returnedObject._id) { returnedObject.id = returnedObject._id.toString() }
-    //if (returnedObject.user.constructor.name && (returnedObject.user.costructor.name === 'ObjectId')) { console.log('YEPPPPPPPPPPPP'); returnedObject.user = returnedObject.user.toString() }
     delete returnedObject._id
     delete returnedObject.__v
   }

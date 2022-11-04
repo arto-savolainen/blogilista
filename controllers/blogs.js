@@ -1,7 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-//const jwt = require('jsonwebtoken') not needed if middleware sets token and decodedToken
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { blogs: 0 })
@@ -78,9 +77,12 @@ blogsRouter.delete('/:id', async (request, response) => {
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-  if (!tokenValid(request)) {
-    return invalidTokenResponse(response)
-  }
+  //doesn't really make sense that any unauthorized user can modify people's blogs,
+  //but this makes changing likes through the frontend easier and is within spec so commented out
+  //(course example solution does not check for user credentials either)
+  // if (!tokenValid(request)) {
+  //   return invalidTokenResponse(response)
+  // }
 
   const blog = await Blog.findById(request.params.id)
 
@@ -88,16 +90,12 @@ blogsRouter.put('/:id', async (request, response) => {
     return response.status(404).end()
   }
 
-  if (!userMatches(request, blog)) {
-    return userMatchError(response)
-  }
+  //commented out so likes can be changed by any user
+  // if (!userMatches(request, blog)) {
+  //   return userMatchError(response)
+  // }
 
   const updateData = request.body
-
-  //why do i have this here? delete after put testing?
-  if (!updateData.likes) {
-    updateData.likes = 0
-  }
 
   blog.url = updateData.url
   blog.title = updateData.title
